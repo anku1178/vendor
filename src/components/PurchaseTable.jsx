@@ -32,6 +32,7 @@ const PurchaseTable = () => {
           id,
           vendor_id,
           item_name,
+          unit,
           quantity,
           price,
           purchase_date,
@@ -97,6 +98,7 @@ const PurchaseTable = () => {
     setEditForm({
       vendor_id: purchase.vendor_id,
       item_name: purchase.item_name,
+      unit: purchase.unit || 'piece',
       quantity: purchase.quantity,
       price: purchase.price,
       purchase_date: purchase.purchase_date
@@ -118,6 +120,7 @@ const PurchaseTable = () => {
       const payload = {
         vendor_id: editForm.vendor_id,
         item_name: editForm.item_name,
+        unit: editForm.unit,
         quantity: parseInt(editForm.quantity),
         price: parseFloat(editForm.price),
         purchase_date: editForm.purchase_date
@@ -176,7 +179,7 @@ const PurchaseTable = () => {
         p.purchase_date ? format(new Date(p.purchase_date), 'MMM dd, yyyy') : '-',
         p.vendor_name,
         p.item_name,
-        p.quantity,
+        `${p.quantity} ${p.unit || ''}`,
         parseFloat(p.price).toFixed(2),
         parseFloat(p.total).toFixed(2)
       ];
@@ -256,8 +259,21 @@ const PurchaseTable = () => {
                     <td>
                       <input type="text" name="item_name" className="edit-input" value={editForm.item_name} onChange={handleEditChange} />
                     </td>
-                    <td className="num-col">
-                      <input type="number" name="quantity" className="edit-input num-eval" value={editForm.quantity} onChange={handleEditChange} />
+                    <td className="num-col" style={{display: 'flex', gap: '0.25rem', alignItems: 'center'}}>
+                      <input type="number" name="quantity" className="edit-input num-eval" value={editForm.quantity} onChange={handleEditChange} style={{width: '60px'}}/>
+                      <select name="unit" className="edit-input" value={editForm.unit} onChange={handleEditChange} style={{width: '60px', padding: '0.25rem'}}>
+                        <option value="piece">piece</option>
+                        <option value="kg">kg</option>
+                        <option value="g">g</option>
+                        <option value="L">L</option>
+                        <option value="mL">mL</option>
+                        <option value="packet">packet</option>
+                        <option value="box">box</option>
+                        <option value="bottle">bottle</option>
+                        <option value="bag">bag</option>
+                        <option value="carton">carton</option>
+                        <option value="dozen">dozen</option>
+                      </select>
                     </td>
                     <td className="num-col">
                       <input type="number" name="price" step="0.01" className="edit-input num-eval" value={editForm.price} onChange={handleEditChange} />
@@ -273,7 +289,7 @@ const PurchaseTable = () => {
                     <td>{purchase.purchase_date ? format(new Date(purchase.purchase_date), 'MMM dd, yyyy') : '-'}</td>
                     <td className="font-medium">{purchase.vendor_name}</td>
                     <td>{purchase.item_name}</td>
-                    <td className="num-col">{purchase.quantity}</td>
+                    <td className="num-col">{purchase.quantity} {purchase.unit}</td>
                     <td className="num-col">₹{parseFloat(purchase.price).toFixed(2)}</td>
                     <td className="num-col font-bold text-primary">₹{parseFloat(purchase.total).toFixed(2)}</td>
                     <td className="action-col text-center">

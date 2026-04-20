@@ -385,7 +385,7 @@ const Home = () => {
                           </div>
                         </td>
                         <td style={{ textAlign: 'right', fontWeight: 600 }}>
-                          <span className={isLowStock ? "text-danger" : ""}>{item.stock}</span>
+                          <span className={isLowStock ? "text-danger" : ""}>{item.stock} {item.unit || ''}</span>
                         </td>
                       </tr>
                     );

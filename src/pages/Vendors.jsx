@@ -150,7 +150,7 @@ const Vendors = () => {
                             <tr key={p.id}>
                               <td>{format(new Date(p.purchase_date), 'MMM dd, yyyy')}</td>
                               <td className="font-medium">{p.item_name}</td>
-                              <td className="num-col">{p.quantity}</td>
+                              <td className="num-col">{p.quantity} {p.unit}</td>
                               <td className="num-col">₹{parseFloat(p.price).toFixed(2)}</td>
                               <td className="num-col font-bold">₹{(p.quantity * p.price).toFixed(2)}</td>
                             </tr>

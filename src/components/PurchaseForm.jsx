@@ -13,6 +13,7 @@ const PurchaseForm = ({ onSuccess }) => {
     vendor_id: '',
     new_vendor_name: '',
     item_name: '',
+    unit: 'piece',
     quantity: '',
     price: '',
     purchase_date: format(new Date(), 'yyyy-MM-dd')
@@ -94,6 +95,7 @@ const PurchaseForm = ({ onSuccess }) => {
       const purchasePayload = {
         vendor_id: finalVendorId,
         item_name: formData.item_name.trim(),
+        unit: formData.unit,
         quantity: parseInt(formData.quantity),
         price: parseFloat(formData.price),
         purchase_date: formData.purchase_date
@@ -110,6 +112,7 @@ const PurchaseForm = ({ onSuccess }) => {
         vendor_id: '',
         new_vendor_name: '',
         item_name: '',
+        unit: 'piece',
         quantity: '',
         price: '',
         purchase_date: format(new Date(), 'yyyy-MM-dd')
@@ -200,17 +203,39 @@ const PurchaseForm = ({ onSuccess }) => {
         <div className="form-row">
           <div className="form-group flex-1">
             <label className="form-label">Quantity</label>
-            <input 
-              type="number" 
-              className="form-input" 
-              name="quantity"
-              min="1"
-              step="1"
-              placeholder="0"
-              value={formData.quantity}
-              onChange={handleChange}
-              required
-            />
+            <div style={{display: 'flex', gap: '0.5rem'}}>
+              <input 
+                type="number" 
+                className="form-input" 
+                name="quantity"
+                min="1"
+                step="1"
+                placeholder="0"
+                value={formData.quantity}
+                onChange={handleChange}
+                required
+                style={{flex: 2}}
+              />
+              <select
+                className="form-select"
+                name="unit"
+                value={formData.unit}
+                onChange={handleChange}
+                style={{flex: 1}}
+              >
+                <option value="piece">piece</option>
+                <option value="kg">kg</option>
+                <option value="g">g</option>
+                <option value="L">L</option>
+                <option value="mL">mL</option>
+                <option value="packet">packet</option>
+                <option value="box">box</option>
+                <option value="bottle">bottle</option>
+                <option value="bag">bag</option>
+                <option value="carton">carton</option>
+                <option value="dozen">dozen</option>
+              </select>
+            </div>
           </div>
 
           <div className="form-group flex-1">
