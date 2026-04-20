@@ -469,3 +469,16 @@
     font-size: 1.3rem;
   }
 }
+
+/* ─── Low Stock Alerts ─── */
+.low-stock-row {
+  background-color: #fef2f2 !important;
+}
+
+.low-stock-row td {
+  border-bottom-color: #fee2e2 !important;
+}
+
+.text-danger {
+  color: #dc2626 !important;
+}

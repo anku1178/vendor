@@ -6,8 +6,10 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   LineChart, Line, PieChart, Pie, Cell
 } from 'recharts';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import {
-  ArrowRight, Eye, ShoppingBag, ShoppingCart, Users, Package, Layers, TrendingUp
+  ArrowRight, Eye, ShoppingBag, ShoppingCart, Users, Package, Layers, TrendingUp, FileText, AlertCircle
 } from 'lucide-react';
 import './Home.css';
 
@@ -124,6 +126,43 @@ const Home = () => {
   const latestPurchases = purchases.slice(0, 5);
   const latestSales = sales.slice(0, 5);
 
+  const exportMonthlyReport = () => {
+    const doc = new jsPDF();
+    
+    doc.setFontSize(22);
+    doc.setTextColor(30, 58, 138); 
+    doc.text("Business Accounting Summary", 14, 22);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Generated on: ${format(new Date(), 'MMM dd, yyyy')}`, 14, 30);
+    
+    doc.setFontSize(12);
+    doc.setTextColor(50);
+    doc.text("Overall Financial Overview", 14, 45);
+
+    // Summary block
+    autoTable(doc, {
+      startY: 50,
+      head: [['Metric', 'Value']],
+      body: [
+        ['Total Spend', `INR ${totalSpend.toFixed(2)}`],
+        ['Total Revenue', `INR ${totalRevenue.toFixed(2)}`],
+        ['Net Profit / Loss', `INR ${totalProfit.toFixed(2)}`],
+        ['Total Purchase Transactions', purchases.length.toString()],
+        ['Total Sale Transactions', sales.length.toString()],
+        ['Unique Items Tracked', uniqueItems.toString()],
+        ['Active Vendors', activeVendors.toString()],
+        ['Total Physical Stock Items', totalStock.toString()],
+      ],
+      theme: 'grid',
+      headStyles: { fillColor: [30, 58, 138] },
+      columnStyles: { 1: { fontStyle: 'bold' } }
+    });
+
+    doc.save(`Accounting_Summary_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+  };
+
   return (
     <div className="dashboard">
 
@@ -137,15 +176,20 @@ const Home = () => {
           </p>
         </div>
         <div className="hero-right">
-          <Link to="/add" className="btn btn-primary hero-btn">
-            <ShoppingBag size={16} /> Add Today's Purchase
-          </Link>
-          <Link to="/sale" className="btn btn-sale-hero hero-btn">
-            <ShoppingCart size={16} /> Log a Sale
-          </Link>
-          <Link to="/records" className="btn btn-outline-hero hero-btn">
-            <Eye size={16} /> View All Records
-          </Link>
+          <div style={{display: 'flex', gap: '0.75rem', flexWrap: 'wrap'}}>
+            <Link to="/add" className="btn btn-primary hero-btn">
+              <ShoppingBag size={16} /> Add Today's Purchase
+            </Link>
+            <Link to="/sale" className="btn btn-sale-hero hero-btn">
+              <ShoppingCart size={16} /> Log a Sale
+            </Link>
+            <Link to="/records" className="btn btn-outline-hero hero-btn">
+              <Eye size={16} /> View All Records
+            </Link>
+            <button onClick={exportMonthlyReport} className="btn hero-btn" style={{background: '#1e3a8a', color: '#fff', border: 'none'}}>
+              <FileText size={16} /> Monthly Summary
+            </button>
+          </div>
           <div className="hero-spend-box">
             <span className="hero-spend-label">Current spend logged</span>
             <span className="hero-spend-value">₹{totalSpend.toFixed(2)}</span>
@@ -383,12 +427,22 @@ const Home = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {inventory.map(item => (
-                    <tr key={item.id}>
-                      <td>{item.item_name}</td>
-                      <td style={{ textAlign: 'right', fontWeight: 600 }}>{item.stock}</td>
-                    </tr>
-                  ))}
+                  {inventory.map(item => {
+                    const isLowStock = item.stock < 10;
+                    return (
+                      <tr key={item.id} className={isLowStock ? "low-stock-row" : ""}>
+                        <td>
+                          <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                            {isLowStock && <AlertCircle size={14} className="text-danger" />}
+                            <span style={{ fontWeight: isLowStock ? 600 : 400 }}>{item.item_name}</span>
+                          </div>
+                        </td>
+                        <td style={{ textAlign: 'right', fontWeight: 600 }}>
+                          <span className={isLowStock ? "text-danger" : ""}>{item.stock}</span>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
