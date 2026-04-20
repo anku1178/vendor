@@ -1,35 +1,6 @@
--- Enable UUID extension
-create extension if not exists "uuid-ossp";
+-- RUN THIS IN SUPABASE SQL EDITOR TO UPGRADE TRIGGERS FOR CRUD
+-- It replaces your old insert-only triggers with full insert/update/delete ones.
 
--- 1. Vendors table
-create table if not exists vendors (
-    id uuid primary key default uuid_generate_v4(),
-    name text not null unique
-);
-
--- 2. Inventory table
-create table if not exists inventory (
-    id uuid primary key default uuid_generate_v4(),
-    item_name text not null unique,
-    stock integer not null default 0
-);
-
--- 3. Purchases table
-create table if not exists purchases (
-    id uuid primary key default uuid_generate_v4(),
-    vendor_id uuid references vendors(id) on delete cascade,
-    item_name text not null,
-    quantity integer not null check (quantity > 0),
-    price numeric not null check (price >= 0),
-    purchase_date date not null default current_date
-);
-
--- Add updated_at column to all tables for tracking 
--- (Not strictly requested but good practice)
--- create extension if not exists moddatetime;
--- Add later if needed.
-
--- Function and trigger to update inventory automatically
 create or replace function update_inventory_stock()
 returns trigger as $$
 begin
@@ -60,25 +31,6 @@ after insert or update or delete on purchases
 for each row
 execute function update_inventory_stock();
 
--- ----------------------------------------------------
--- SECURITY CONFIGURATION
--- ----------------------------------------------------
--- Since this is an internal dashboard without login/auth, 
--- we need to disable Row Level Security (RLS) so the 
--- frontend app can freely insert and read the database.
-
-alter table vendors disable row level security;
-alter table inventory disable row level security;
-alter table purchases disable row level security;
-create table if not exists sales (
-    id uuid primary key default uuid_generate_v4(),
-    item_name text not null,
-    quantity_sold integer not null check (quantity_sold > 0),
-    sale_price numeric not null check (sale_price >= 0),
-    sale_date date not null default current_date
-);
-
-alter table sales disable row level security;
 
 create or replace function deduct_inventory_stock()
 returns trigger as $$

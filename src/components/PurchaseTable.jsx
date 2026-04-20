@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { supabase } from '../services/supabase';
-import { RefreshCw, Search, ArrowUpDown } from 'lucide-react';
+import { RefreshCw, Search, ArrowUpDown, Edit2, Trash2, Check, X } from 'lucide-react';
 import './PurchaseTable.css';
 
 const PurchaseTable = () => {
   const [purchases, setPurchases] = useState([]);
+  const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState('purchase_date');
   const [sortAsc, setSortAsc] = useState(false);
+
+  // Edit State
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState({});
 
   const fetchPurchases = async () => {
     if (!supabase) {
@@ -19,18 +24,16 @@ const PurchaseTable = () => {
     
     setLoading(true);
     try {
-      // Query purchases joined with vendors
       const { data, error } = await supabase
         .from('purchases')
         .select(`
           id,
+          vendor_id,
           item_name,
           quantity,
           price,
           purchase_date,
-          vendors (
-            name
-          )
+          vendors (name)
         `);
 
       if (error) throw error;
@@ -42,6 +45,11 @@ const PurchaseTable = () => {
       }));
       
       setPurchases(formattedData);
+
+      // also fetch vendors for the edit dropdown
+      const { data: vData } = await supabase.from('vendors').select('*').order('name');
+      if (vData) setVendors(vData);
+
     } catch (error) {
       console.error('Error fetching purchases:', error.message);
     } finally {
@@ -81,6 +89,71 @@ const PurchaseTable = () => {
       });
   }, [purchases, searchTerm, sortField, sortAsc]);
 
+  // CRUD Actions
+  const handleEditClick = (purchase) => {
+    setEditingId(purchase.id);
+    setEditForm({
+      vendor_id: purchase.vendor_id,
+      item_name: purchase.item_name,
+      quantity: purchase.quantity,
+      price: purchase.price,
+      purchase_date: purchase.purchase_date
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setEditForm({});
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSaveEdit = async (id) => {
+    try {
+      const payload = {
+        vendor_id: editForm.vendor_id,
+        item_name: editForm.item_name,
+        quantity: parseInt(editForm.quantity),
+        price: parseFloat(editForm.price),
+        purchase_date: editForm.purchase_date
+      };
+
+      const { error } = await supabase
+        .from('purchases')
+        .update(payload)
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      setEditingId(null);
+      fetchPurchases(); // refresh list
+    } catch (err) {
+      console.error('Error updating purchase:', err);
+      alert('Failed to update: ' + err.message);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this purchase? This will automatically remove these items from your inventory stock.")) {
+      return;
+    }
+    try {
+      const { error } = await supabase
+        .from('purchases')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      fetchPurchases();
+    } catch (err) {
+      console.error('Error deleting purchase:', err);
+      alert('Failed to delete: ' + err.message);
+    }
+  };
+
   return (
     <div className="card">
       <div className="table-header-ops">
@@ -101,51 +174,67 @@ const PurchaseTable = () => {
       </div>
 
       <div className="table-container">
-        <table className="table">
+        <table className="table crud-table">
           <thead>
             <tr>
-              <th onClick={() => handleSort('purchase_date')} className="sortable">
-                Date <ArrowUpDown size={14} className="sort-icon" />
-              </th>
-              <th onClick={() => handleSort('vendor_name')} className="sortable">
-                Vendor <ArrowUpDown size={14} className="sort-icon" />
-              </th>
-              <th onClick={() => handleSort('item_name')} className="sortable">
-                Item <ArrowUpDown size={14} className="sort-icon" />
-              </th>
-              <th onClick={() => handleSort('quantity')} className="sortable num-col">
-                Qty <ArrowUpDown size={14} className="sort-icon" />
-              </th>
-              <th onClick={() => handleSort('price')} className="sortable num-col">
-                Price <ArrowUpDown size={14} className="sort-icon" />
-              </th>
-              <th onClick={() => handleSort('total')} className="sortable num-col">
-                Total <ArrowUpDown size={14} className="sort-icon" />
-              </th>
+              <th onClick={() => handleSort('purchase_date')} className="sortable">Date <ArrowUpDown size={14} className="sort-icon" /></th>
+              <th onClick={() => handleSort('vendor_name')} className="sortable">Vendor <ArrowUpDown size={14} className="sort-icon" /></th>
+              <th onClick={() => handleSort('item_name')} className="sortable">Item <ArrowUpDown size={14} className="sort-icon" /></th>
+              <th onClick={() => handleSort('quantity')} className="sortable num-col">Qty <ArrowUpDown size={14} className="sort-icon" /></th>
+              <th onClick={() => handleSort('price')} className="sortable num-col">Price <ArrowUpDown size={14} className="sort-icon" /></th>
+              <th onClick={() => handleSort('total')} className="sortable num-col">Total <ArrowUpDown size={14} className="sort-icon" /></th>
+              <th className="action-col text-center">Actions</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr>
-                <td colSpan="6" className="text-center py-4">Loading data...</td>
-              </tr>
+              <tr><td colSpan="7" className="text-center py-4">Loading data...</td></tr>
             ) : filteredAndSortedPurchases.length === 0 ? (
-              <tr>
-                <td colSpan="6" className="text-center py-4 text-light">No records found.</td>
-              </tr>
+              <tr><td colSpan="7" className="text-center py-4 text-light">No records found.</td></tr>
             ) : (
-              filteredAndSortedPurchases.map((purchase) => (
-                <tr key={purchase.id}>
-                  <td>{purchase.purchase_date ? format(new Date(purchase.purchase_date), 'MMM dd, yyyy') : '-'}</td>
-                  <td className="font-medium">{purchase.vendor_name}</td>
-                  <td>{purchase.item_name}</td>
-                  <td className="num-col">{purchase.quantity}</td>
-                  <td className="num-col">₹{parseFloat(purchase.price).toFixed(2)}</td>
-                  <td className="num-col font-bold text-primary">
-                    ₹{parseFloat(purchase.total).toFixed(2)}
-                  </td>
-                </tr>
-              ))
+              filteredAndSortedPurchases.map((purchase) => {
+                const isEditing = editingId === purchase.id;
+                
+                return isEditing ? (
+                  <tr key={purchase.id} className="editing-row">
+                    <td>
+                      <input type="date" name="purchase_date" className="edit-input" value={editForm.purchase_date} onChange={handleEditChange} />
+                    </td>
+                    <td>
+                      <select name="vendor_id" className="edit-input" value={editForm.vendor_id} onChange={handleEditChange}>
+                        {vendors.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
+                      </select>
+                    </td>
+                    <td>
+                      <input type="text" name="item_name" className="edit-input" value={editForm.item_name} onChange={handleEditChange} />
+                    </td>
+                    <td className="num-col">
+                      <input type="number" name="quantity" className="edit-input num-eval" value={editForm.quantity} onChange={handleEditChange} />
+                    </td>
+                    <td className="num-col">
+                      <input type="number" name="price" step="0.01" className="edit-input num-eval" value={editForm.price} onChange={handleEditChange} />
+                    </td>
+                    <td className="num-col font-bold text-primary">₹{(editForm.quantity * editForm.price).toFixed(2)}</td>
+                    <td className="action-col text-center">
+                      <button className="action-btn save-btn" onClick={() => handleSaveEdit(purchase.id)} title="Save"><Check size={16}/></button>
+                      <button className="action-btn cancel-btn" onClick={handleCancelEdit} title="Cancel"><X size={16}/></button>
+                    </td>
+                  </tr>
+                ) : (
+                  <tr key={purchase.id}>
+                    <td>{purchase.purchase_date ? format(new Date(purchase.purchase_date), 'MMM dd, yyyy') : '-'}</td>
+                    <td className="font-medium">{purchase.vendor_name}</td>
+                    <td>{purchase.item_name}</td>
+                    <td className="num-col">{purchase.quantity}</td>
+                    <td className="num-col">₹{parseFloat(purchase.price).toFixed(2)}</td>
+                    <td className="num-col font-bold text-primary">₹{parseFloat(purchase.total).toFixed(2)}</td>
+                    <td className="action-col text-center">
+                      <button className="action-btn edit-btn" onClick={() => handleEditClick(purchase)} title="Edit"><Edit2 size={16}/></button>
+                      <button className="action-btn del-btn" onClick={() => handleDelete(purchase.id)} title="Delete"><Trash2 size={16}/></button>
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
