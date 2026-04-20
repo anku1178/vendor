@@ -364,7 +364,7 @@ const Home = () => {
         <div className="dash-card">
           <span className="card-tag tag-green">INVENTORY</span>
           <h3 className="card-heading">Current Stock</h3>
-          {inventory.length > 0 ? (
+          {inventory.filter(i => i.stock > 0).length > 0 ? (
             <div className="stock-table-wrap">
               <table className="stock-table">
                 <thead>
@@ -374,7 +374,7 @@ const Home = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {inventory.map(item => {
+                  {inventory.filter(item => item.stock > 0).map(item => {
                     const isLowStock = item.stock < 10;
                     return (
                       <tr key={item.id} className={isLowStock ? "low-stock-row" : ""}>
