@@ -4,6 +4,7 @@ import Sidebar from './components/Sidebar';
 import Home from './pages/Home';
 import AddPurchase from './pages/AddPurchase';
 import ViewRecords from './pages/ViewRecords';
+import AddSale from './pages/AddSale';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/add" element={<AddPurchase />} />
+            <Route path="/sale" element={<AddSale />} />
             <Route path="/records" element={<ViewRecords />} />
           </Routes>
         </main>
