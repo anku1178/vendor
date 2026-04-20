@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import AddPurchase from './pages/AddPurchase';
 import ViewRecords from './pages/ViewRecords';
 import AddSale from './pages/AddSale';
+import ViewSales from './pages/ViewSales';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
             <Route path="/add" element={<AddPurchase />} />
             <Route path="/sale" element={<AddSale />} />
             <Route path="/records" element={<ViewRecords />} />
+            <Route path="/sales-records" element={<ViewSales />} />
           </Routes>
         </main>
       </div>

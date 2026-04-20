@@ -79,6 +79,17 @@
   background: rgba(77, 168, 218, 0.08);
 }
 
+.btn-sale-hero {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+  border: none;
+}
+
+.btn-sale-hero:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
 .hero-spend-box {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
@@ -102,22 +113,22 @@
   color: var(--text-dark);
 }
 
-/* ─── Stat Cards Row ─── */
-.stat-cards-row {
+/* ─── Stat Cards Row (6 cards) ─── */
+.stat-cards-row-6 {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
 
 @media (max-width: 900px) {
-  .stat-cards-row {
+  .stat-cards-row-6 {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 500px) {
-  .stat-cards-row {
+  .stat-cards-row-6 {
     grid-template-columns: 1fr;
   }
 }
@@ -144,8 +155,10 @@
 
 .stat-card-v2:nth-child(1)::before { background: #4DA8DA; }
 .stat-card-v2:nth-child(2)::before { background: #10b981; }
-.stat-card-v2:nth-child(3)::before { background: #f97316; }
-.stat-card-v2:nth-child(4)::before { background: #8b5cf6; }
+.stat-card-v2:nth-child(3)::before { background: #f59e0b; }
+.stat-card-v2:nth-child(4)::before { background: #f97316; }
+.stat-card-v2:nth-child(5)::before { background: #8b5cf6; }
+.stat-card-v2:nth-child(6)::before { background: #4DA8DA; }
 
 .stat-card-v2:hover {
   transform: translateY(-2px);

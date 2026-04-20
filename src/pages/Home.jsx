@@ -7,7 +7,7 @@ import {
   LineChart, Line, PieChart, Pie, Cell
 } from 'recharts';
 import {
-  ArrowRight, Eye, ShoppingBag, Users, Package, Layers
+  ArrowRight, Eye, ShoppingBag, ShoppingCart, Users, Package, Layers, TrendingUp
 } from 'lucide-react';
 import './Home.css';
 
@@ -16,6 +16,7 @@ const COLORS = ['#4DA8DA', '#10b981', '#f97316', '#8b5cf6', '#ef4444', '#06b6d4'
 const Home = () => {
   const [loading, setLoading] = useState(true);
   const [purchases, setPurchases] = useState([]);
+  const [sales, setSales] = useState([]);
   const [inventory, setInventory] = useState([]);
   const [vendors, setVendors] = useState([]);
 
@@ -30,16 +31,19 @@ const Home = () => {
   const fetchAll = async () => {
     if (!supabase) { setLoading(false); return; }
     try {
-      const [pRes, iRes, vRes] = await Promise.all([
+      const [pRes, sRes, iRes, vRes] = await Promise.all([
         supabase.from('purchases').select('*, vendors(name)').order('purchase_date', { ascending: false }),
+        supabase.from('sales').select('*').order('sale_date', { ascending: false }),
         supabase.from('inventory').select('*').order('item_name'),
         supabase.from('vendors').select('*').order('name')
       ]);
       if (pRes.error) throw pRes.error;
+      if (sRes.error) throw sRes.error;
       if (iRes.error) throw iRes.error;
       if (vRes.error) throw vRes.error;
 
       setPurchases(pRes.data || []);
+      setSales(sRes.data || []);
       setInventory(iRes.data || []);
       setVendors(vRes.data || []);
     } catch (err) {
@@ -51,6 +55,8 @@ const Home = () => {
 
   // ── Derived Stats ──
   const totalSpend = purchases.reduce((s, p) => s + p.quantity * p.price, 0);
+  const totalRevenue = sales.reduce((s, sl) => s + sl.quantity_sold * sl.sale_price, 0);
+  const totalProfit = totalRevenue - totalSpend;
   const activeVendors = vendors.length;
   const uniqueItems = [...new Set(purchases.map(p => p.item_name))].length;
   const totalStock = inventory.reduce((s, i) => s + i.stock, 0);
@@ -114,8 +120,9 @@ const Home = () => {
       }));
   })();
 
-  // Latest 5 purchases
+  // Latest 5 purchases & sales
   const latestPurchases = purchases.slice(0, 5);
+  const latestSales = sales.slice(0, 5);
 
   return (
     <div className="dashboard">
@@ -133,6 +140,9 @@ const Home = () => {
           <Link to="/add" className="btn btn-primary hero-btn">
             <ShoppingBag size={16} /> Add Today's Purchase
           </Link>
+          <Link to="/sale" className="btn btn-sale-hero hero-btn">
+            <ShoppingCart size={16} /> Log a Sale
+          </Link>
           <Link to="/records" className="btn btn-outline-hero hero-btn">
             <Eye size={16} /> View All Records
           </Link>
@@ -144,26 +154,36 @@ const Home = () => {
       </section>
 
       {/* ─── Stat Cards ─── */}
-      <section className="stat-cards-row">
+      <section className="stat-cards-row-6">
         <div className="stat-card-v2">
           <span className="stat-tag tag-blue">TOTAL SPEND</span>
           <h2 className="stat-big-value">₹{totalSpend.toFixed(2)}</h2>
-          <p className="stat-sub">{purchases.length} purchase entries recorded</p>
+          <p className="stat-sub">{purchases.length} purchase entries</p>
         </div>
         <div className="stat-card-v2">
-          <span className="stat-tag tag-green">ACTIVE VENDORS</span>
+          <span className="stat-tag tag-green">TOTAL REVENUE</span>
+          <h2 className="stat-big-value">₹{totalRevenue.toFixed(2)}</h2>
+          <p className="stat-sub">{sales.length} sale entries</p>
+        </div>
+        <div className="stat-card-v2">
+          <span className="stat-tag" style={{color: totalProfit >= 0 ? '#059669' : '#dc2626', background: totalProfit >= 0 ? '#d1fae5' : '#fee2e2'}}>PROFIT / LOSS</span>
+          <h2 className="stat-big-value" style={{color: totalProfit >= 0 ? '#059669' : '#dc2626'}}>{totalProfit >= 0 ? '+' : ''}₹{totalProfit.toFixed(2)}</h2>
+          <p className="stat-sub">{totalProfit >= 0 ? 'You are in profit!' : 'Currently at a loss'}</p>
+        </div>
+        <div className="stat-card-v2">
+          <span className="stat-tag tag-orange">ACTIVE VENDORS</span>
           <h2 className="stat-big-value">{activeVendors}</h2>
-          <p className="stat-sub">Quick view of your supplier network</p>
+          <p className="stat-sub">Supplier network</p>
         </div>
         <div className="stat-card-v2">
-          <span className="stat-tag tag-orange">ITEMS PURCHASED</span>
+          <span className="stat-tag tag-purple">ITEMS TRACKED</span>
           <h2 className="stat-big-value">{uniqueItems}</h2>
-          <p className="stat-sub">{uniqueItems} unique items tracked</p>
+          <p className="stat-sub">{uniqueItems} unique items</p>
         </div>
         <div className="stat-card-v2">
-          <span className="stat-tag tag-purple">STOCK ON HAND</span>
+          <span className="stat-tag tag-blue">STOCK ON HAND</span>
           <h2 className="stat-big-value">{totalStock}</h2>
-          <p className="stat-sub">{totalStock === 0 ? 'No stock movement yet' : `${totalStock} units available`}</p>
+          <p className="stat-sub">{totalStock === 0 ? 'No stock yet' : `${totalStock} units`}</p>
         </div>
       </section>
 
@@ -233,7 +253,7 @@ const Home = () => {
           )}
         </div>
 
-        {/* Recent Activity */}
+        {/* Recent Purchases */}
         <div className="dash-card">
           <span className="card-tag tag-blue">RECENT ACTIVITY</span>
           <h3 className="card-heading">Latest Purchases</h3>
@@ -256,6 +276,36 @@ const Home = () => {
             <div className="empty-state">
               <p className="empty-bold">No purchases yet</p>
               <p className="empty-muted">Start with the Add Purchase page and the dashboard will fill itself in.</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ─── Row 2B: Recent Sales ─── */}
+      <section className="dash-grid-3">
+        {/* Recent Sales */}
+        <div className="dash-card">
+          <span className="card-tag tag-green">SALES ACTIVITY</span>
+          <h3 className="card-heading">Latest Sales</h3>
+          {latestSales.length > 0 ? (
+            <ul className="recent-list">
+              {latestSales.map(s => (
+                <li key={s.id} className="recent-item">
+                  <div className="recent-info">
+                    <span className="recent-name">{s.item_name}</span>
+                    <span className="recent-vendor">Sold {s.quantity_sold} units</span>
+                  </div>
+                  <div className="recent-right">
+                    <span className="recent-amount" style={{color:'#10b981'}}>+₹{(s.sale_price * s.quantity_sold).toFixed(2)}</span>
+                    <span className="recent-date">{format(parseISO(s.sale_date), 'MMM dd')}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="empty-state">
+              <p className="empty-bold">No sales yet</p>
+              <p className="empty-muted">Log a sale to see your revenue here.</p>
             </div>
           )}
         </div>

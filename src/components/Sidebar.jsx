@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, PlusCircle, ShoppingCart, List, LayoutDashboard, Settings } from 'lucide-react';
+import { Home, PlusCircle, ShoppingCart, List, ClipboardList, LayoutDashboard, Settings } from 'lucide-react';
 import './Sidebar.css';
 
 const Sidebar = () => {
@@ -36,7 +36,13 @@ const Sidebar = () => {
           <li className="nav-item">
             <NavLink to="/records" className={({isActive}) => isActive ? "nav-link active" : "nav-link"}>
               <List size={20} />
-              <span>View Records</span>
+              <span>Purchase Records</span>
+            </NavLink>
+          </li>
+          <li className="nav-item">
+            <NavLink to="/sales-records" className={({isActive}) => isActive ? "nav-link active" : "nav-link"}>
+              <ClipboardList size={20} />
+              <span>Sales Records</span>
             </NavLink>
           </li>
         </ul>
