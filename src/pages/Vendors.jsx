@@ -138,7 +138,8 @@ const Vendors = () => {
                           <th>Date</th>
                           <th>Item</th>
                           <th className="num-col">Qty</th>
-                          <th className="num-col">Price</th>
+                          <th className="num-col">Buy Price</th>
+                          <th className="num-col">Sell Price</th>
                           <th className="num-col">Total</th>
                         </tr>
                       </thead>
@@ -152,6 +153,7 @@ const Vendors = () => {
                               <td className="font-medium">{p.item_name}</td>
                               <td className="num-col">{p.quantity} {p.unit}</td>
                               <td className="num-col">₹{parseFloat(p.price).toFixed(2)}</td>
+                              <td className="num-col" style={{color: '#10b981'}}>₹{parseFloat(p.selling_price || 0).toFixed(2)}</td>
                               <td className="num-col font-bold">₹{(p.quantity * p.price).toFixed(2)}</td>
                             </tr>
                           ))

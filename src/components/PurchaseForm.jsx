@@ -16,6 +16,7 @@ const PurchaseForm = ({ onSuccess }) => {
     unit: 'piece',
     quantity: '',
     price: '',
+    selling_price: '',
     purchase_date: format(new Date(), 'yyyy-MM-dd')
   });
 
@@ -98,6 +99,7 @@ const PurchaseForm = ({ onSuccess }) => {
         unit: formData.unit,
         quantity: parseInt(formData.quantity),
         price: parseFloat(formData.price),
+        selling_price: parseFloat(formData.selling_price || 0),
         purchase_date: formData.purchase_date
       };
 
@@ -115,6 +117,7 @@ const PurchaseForm = ({ onSuccess }) => {
         unit: 'piece',
         quantity: '',
         price: '',
+        selling_price: '',
         purchase_date: format(new Date(), 'yyyy-MM-dd')
       });
       
@@ -250,6 +253,25 @@ const PurchaseForm = ({ onSuccess }) => {
               value={formData.price}
               onChange={handleChange}
               required
+            />
+          </div>
+
+          <div className="form-group flex-1">
+            <label className="form-label">
+              Selling Price (₹) 
+              {formData.price && formData.selling_price && parseFloat(formData.selling_price) > parseFloat(formData.price) 
+                ? <span style={{marginLeft: '0.25rem', color: '#10b981', fontSize: '0.75rem'}}> (+{(((parseFloat(formData.selling_price) - parseFloat(formData.price)) / parseFloat(formData.price)) * 100).toFixed(0)}%)</span> 
+                : null}
+            </label>
+            <input 
+              type="number" 
+              className="form-input" 
+              name="selling_price"
+              min="0"
+              step="0.01"
+              placeholder="0.00 (Optional)"
+              value={formData.selling_price}
+              onChange={handleChange}
             />
           </div>
         </div>

@@ -379,9 +379,12 @@ const Home = () => {
                     return (
                       <tr key={item.id} className={isLowStock ? "low-stock-row" : ""}>
                         <td>
-                          <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-                            {isLowStock && <AlertCircle size={14} className="text-danger" />}
-                            <span style={{ fontWeight: isLowStock ? 600 : 400 }}>{item.item_name}</span>
+                          <div style={{display: 'flex', flexDirection: 'column'}}>
+                            <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                              {isLowStock && <AlertCircle size={14} className="text-danger" />}
+                              <span style={{ fontWeight: isLowStock ? 600 : 400 }}>{item.item_name}</span>
+                            </div>
+                            {item.selling_price > 0 && <span style={{fontSize: '0.75rem', color: '#10b981', marginLeft: isLowStock ? '1.5rem' : '0'}}>Sell: ₹{item.selling_price}</span>}
                           </div>
                         </td>
                         <td style={{ textAlign: 'right', fontWeight: 600 }}>

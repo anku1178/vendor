@@ -35,6 +35,7 @@ const PurchaseTable = () => {
           unit,
           quantity,
           price,
+          selling_price,
           purchase_date,
           vendors (name)
         `);
@@ -101,6 +102,7 @@ const PurchaseTable = () => {
       unit: purchase.unit || 'piece',
       quantity: purchase.quantity,
       price: purchase.price,
+      selling_price: purchase.selling_price || 0,
       purchase_date: purchase.purchase_date
     });
   };
@@ -123,6 +125,7 @@ const PurchaseTable = () => {
         unit: editForm.unit,
         quantity: parseInt(editForm.quantity),
         price: parseFloat(editForm.price),
+        selling_price: parseFloat(editForm.selling_price || 0),
         purchase_date: editForm.purchase_date
       };
 
@@ -171,7 +174,7 @@ const PurchaseTable = () => {
     doc.text(`Generated on: ${format(new Date(), 'MMM dd, yyyy HH:mm')}`, 14, 30);
 
     // Map table data
-    const tableColumn = ["Date", "Vendor", "Item", "Qty", "Price (INR)", "Total (INR)"];
+    const tableColumn = ["Date", "Vendor", "Item", "Qty", "Price", "Sell Price", "Total"];
     const tableRows = [];
 
     filteredAndSortedPurchases.forEach(p => {
@@ -181,6 +184,7 @@ const PurchaseTable = () => {
         p.item_name,
         `${p.quantity} ${p.unit || ''}`,
         parseFloat(p.price).toFixed(2),
+        parseFloat(p.selling_price || 0).toFixed(2),
         parseFloat(p.total).toFixed(2)
       ];
       tableRows.push(pData);
@@ -233,6 +237,7 @@ const PurchaseTable = () => {
               <th onClick={() => handleSort('item_name')} className="sortable">Item <ArrowUpDown size={14} className="sort-icon" /></th>
               <th onClick={() => handleSort('quantity')} className="sortable num-col">Qty <ArrowUpDown size={14} className="sort-icon" /></th>
               <th onClick={() => handleSort('price')} className="sortable num-col">Price <ArrowUpDown size={14} className="sort-icon" /></th>
+              <th onClick={() => handleSort('selling_price')} className="sortable num-col">Sell Price <ArrowUpDown size={14} className="sort-icon" /></th>
               <th onClick={() => handleSort('total')} className="sortable num-col">Total <ArrowUpDown size={14} className="sort-icon" /></th>
               <th className="action-col text-center">Actions</th>
             </tr>
@@ -278,6 +283,9 @@ const PurchaseTable = () => {
                     <td className="num-col">
                       <input type="number" name="price" step="0.01" className="edit-input num-eval" value={editForm.price} onChange={handleEditChange} />
                     </td>
+                    <td className="num-col">
+                      <input type="number" name="selling_price" step="0.01" className="edit-input num-eval" value={editForm.selling_price} onChange={handleEditChange} />
+                    </td>
                     <td className="num-col font-bold text-primary">₹{(editForm.quantity * editForm.price).toFixed(2)}</td>
                     <td className="action-col text-center">
                       <button className="action-btn save-btn" onClick={() => handleSaveEdit(purchase.id)} title="Save"><Check size={16}/></button>
@@ -291,6 +299,7 @@ const PurchaseTable = () => {
                     <td>{purchase.item_name}</td>
                     <td className="num-col">{purchase.quantity} {purchase.unit}</td>
                     <td className="num-col">₹{parseFloat(purchase.price).toFixed(2)}</td>
+                    <td className="num-col" style={{color: '#10b981'}}>₹{parseFloat(purchase.selling_price || 0).toFixed(2)}</td>
                     <td className="num-col font-bold text-primary">₹{parseFloat(purchase.total).toFixed(2)}</td>
                     <td className="action-col text-center">
                       <button className="action-btn edit-btn" onClick={() => handleEditClick(purchase)} title="Edit"><Edit2 size={16}/></button>
