@@ -40,12 +40,6 @@ const Sidebar = () => {
             </NavLink>
           </li>
           <li className="nav-item">
-            <NavLink to="/sales-records" className={({isActive}) => isActive ? "nav-link active" : "nav-link"}>
-              <ClipboardList size={20} />
-              <span>Sales Records</span>
-            </NavLink>
-          </li>
-          <li className="nav-item">
             <NavLink to="/vendors" className={({isActive}) => isActive ? "nav-link active" : "nav-link"}>
               <Building size={20} />
               <span>Vendors</span>

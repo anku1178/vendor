@@ -70,38 +70,4 @@ execute function update_inventory_stock();
 alter table vendors disable row level security;
 alter table inventory disable row level security;
 alter table purchases disable row level security;
-create table if not exists sales (
-    id uuid primary key default uuid_generate_v4(),
-    item_name text not null,
-    quantity_sold integer not null check (quantity_sold > 0),
-    sale_price numeric not null check (sale_price >= 0),
-    sale_date date not null default current_date
-);
 
-alter table sales disable row level security;
-
-create or replace function deduct_inventory_stock()
-returns trigger as $$
-begin
-    if (TG_OP = 'DELETE') then
-        -- Add back the sold quantity
-        update inventory set stock = stock + old.quantity_sold where item_name = old.item_name;
-        return old;
-    elsif (TG_OP = 'UPDATE') then
-        -- Undo old, apply new
-        update inventory set stock = stock + old.quantity_sold where item_name = old.item_name;
-        update inventory set stock = stock - new.quantity_sold where item_name = new.item_name;
-        return new;
-    elsif (TG_OP = 'INSERT') then
-        update inventory set stock = stock - new.quantity_sold where item_name = new.item_name;
-        return new;
-    end if;
-end;
-$$ language plpgsql;
-
-drop trigger if exists tr_deduct_inventory on sales;
-
-create trigger tr_deduct_inventory
-after insert or update or delete on sales
-for each row
-execute function deduct_inventory_stock();
