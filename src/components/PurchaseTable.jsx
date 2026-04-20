@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { supabase } from '../services/supabase';
-import { RefreshCw, Search, ArrowUpDown, Edit2, Trash2, Check, X } from 'lucide-react';
+import { RefreshCw, Search, ArrowUpDown, Edit2, Trash2, Check, X, FileText } from 'lucide-react';
 import './PurchaseTable.css';
 
 const PurchaseTable = () => {
@@ -154,6 +156,46 @@ const PurchaseTable = () => {
     }
   };
 
+  const exportPDF = () => {
+    const doc = new jsPDF();
+    
+    // Add simple header
+    doc.setFontSize(18);
+    doc.text("Purchase Records Report", 14, 22);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Generated on: ${format(new Date(), 'MMM dd, yyyy HH:mm')}`, 14, 30);
+
+    // Map table data
+    const tableColumn = ["Date", "Vendor", "Item", "Qty", "Price (INR)", "Total (INR)"];
+    const tableRows = [];
+
+    filteredAndSortedPurchases.forEach(p => {
+      const pData = [
+        p.purchase_date ? format(new Date(p.purchase_date), 'MMM dd, yyyy') : '-',
+        p.vendor_name,
+        p.item_name,
+        p.quantity,
+        parseFloat(p.price).toFixed(2),
+        parseFloat(p.total).toFixed(2)
+      ];
+      tableRows.push(pData);
+    });
+
+    // Generate table
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 35,
+      theme: 'grid',
+      headStyles: { fillColor: [77, 168, 218] },
+      styles: { fontSize: 9 }
+    });
+
+    doc.save(`Purchase_Records_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+  };
+
   return (
     <div className="card">
       <div className="table-header-ops">
@@ -167,10 +209,16 @@ const PurchaseTable = () => {
             className="search-input-field"
           />
         </div>
-        <button className="btn btn-outline" onClick={fetchPurchases} disabled={loading}>
-          <RefreshCw size={16} className={loading ? 'spinning' : ''} />
-          {loading ? 'Refreshing...' : 'Refresh'}
-        </button>
+        <div style={{display: 'flex', gap: '0.75rem'}}>
+          <button className="btn btn-outline" onClick={exportPDF} title="Download PDF Report">
+            <FileText size={16} />
+            PDF
+          </button>
+          <button className="btn btn-outline" onClick={fetchPurchases} disabled={loading}>
+            <RefreshCw size={16} className={loading ? 'spinning' : ''} />
+            {loading ? 'Refreshing...' : 'Refresh'}
+          </button>
+        </div>
       </div>
 
       <div className="table-container">
