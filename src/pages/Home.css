@@ -482,3 +482,87 @@
 .text-danger {
   color: #dc2626 !important;
 }
+
+/* ─── Mobile Dashboard ─── */
+@media (max-width: 767px) {
+  .dashboard {
+    max-width: 100%;
+  }
+
+  .hero-banner {
+    padding: 1.25rem;
+    gap: 1rem;
+  }
+
+  .hero-title {
+    font-size: 1.15rem;
+  }
+
+  .hero-desc {
+    font-size: 0.85rem;
+  }
+
+  .hero-right {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .hero-btn {
+    flex: 1;
+    justify-content: center;
+    font-size: 0.82rem;
+    padding: 0.55rem 0.75rem;
+  }
+
+  .hero-spend-box {
+    width: 100%;
+  }
+
+  .stat-cards-row-6 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .stat-card-v2 {
+    padding: 1rem;
+  }
+
+  .stat-big-value {
+    font-size: 1.5rem;
+  }
+
+  .stat-sub {
+    font-size: 0.75rem;
+  }
+
+  .dash-grid-3 {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .dash-card {
+    padding: 1rem;
+  }
+
+  .card-header-row {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .chart-area {
+    min-height: 180px;
+  }
+
+  .stock-table-wrap {
+    max-height: 220px;
+  }
+
+  .recent-name {
+    font-size: 0.82rem;
+  }
+
+  .recent-amount {
+    font-size: 0.85rem;
+  }
+}

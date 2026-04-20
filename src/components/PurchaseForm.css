@@ -86,3 +86,41 @@
   gap: 0.5rem;
   font-weight: 500;
 }
+
+/* ─── Mobile Form ─── */
+@media (max-width: 767px) {
+  .form-container {
+    max-width: 100%;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .flex-1 {
+    min-width: 100%;
+  }
+
+  .total-summary {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+    padding: 1rem;
+  }
+
+  .total-summary strong {
+    font-size: 1.3rem;
+  }
+
+  .btn-lg {
+    width: 100%;
+    min-width: unset;
+    padding: 0.85rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  .form-actions {
+    justify-content: stretch;
+  }
+}

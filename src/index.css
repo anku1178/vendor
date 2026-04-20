@@ -56,6 +56,30 @@ body {
   }
 }
 
+@media (max-width: 767px) {
+  .main-content {
+    padding: 1rem;
+    padding-top: 4rem; /* space for hamburger button */
+  }
+
+  .table th, .table td {
+    padding: 0.6rem 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+  }
+}
+
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
   color: var(--text-dark);

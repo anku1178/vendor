@@ -171,3 +171,32 @@
   text-align: right;
   width: 80px;
 }
+
+/* ─── Mobile Table ─── */
+@media (max-width: 767px) {
+  .table-header-ops {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-box {
+    max-width: 100%;
+  }
+
+  .crud-table {
+    font-size: 0.78rem;
+  }
+
+  .action-col {
+    width: 60px;
+  }
+
+  .edit-input {
+    font-size: 0.78rem;
+    padding: 0.25rem 0.35rem;
+  }
+
+  .edit-input.num-eval {
+    width: 55px;
+  }
+}

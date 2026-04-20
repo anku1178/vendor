@@ -205,3 +205,58 @@
 .mt-2 { margin-top: 0.5rem; }
 .mb-1 { margin-bottom: 0.25rem; }
 .mb-3 { margin-bottom: 1.5rem; }
+
+/* ─── Mobile Vendors ─── */
+@media (max-width: 767px) {
+  .vendor-layout {
+    flex-direction: column;
+  }
+
+  .vendor-sidebar {
+    width: 100%;
+  }
+
+  .vendor-list {
+    max-height: 200px;
+  }
+
+  .vendor-list-item {
+    padding: 0.75rem 1rem;
+  }
+
+  .vendor-list-val {
+    font-size: 0.8rem;
+  }
+
+  .profile-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .profile-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 1.5rem;
+    border-radius: 12px;
+  }
+
+  .profile-name {
+    font-size: 1.2rem;
+  }
+
+  .profile-id {
+    font-size: 0.72rem;
+    word-break: break-all;
+  }
+
+  .profile-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .p-stat-box {
+    padding: 1rem;
+  }
+}
