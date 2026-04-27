@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, PlusCircle, List, LayoutDashboard, Settings, Building, Menu, X } from 'lucide-react';
+import { Home, PlusCircle, List, LayoutDashboard, Settings, Building, Menu, X, LogOut } from 'lucide-react';
 import './Sidebar.css';
 
-const Sidebar = () => {
+const Sidebar = ({ onLogout }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const closeSidebar = () => setMobileOpen(false);
@@ -59,6 +59,10 @@ const Sidebar = () => {
         </nav>
 
         <div className="sidebar-footer">
+          <button className="nav-link logout-btn" onClick={onLogout}>
+            <LogOut size={20} />
+            <span>Logout</span>
+          </button>
           <a href="#" className="nav-link">
             <Settings size={20} />
             <span>Settings</span>

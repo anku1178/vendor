@@ -158,4 +158,22 @@
 .sidebar-footer {
   padding: 1.5rem 1rem;
   border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1rem;
+  color: #ef4444 !important; /* Red for logout */
+}
+
+.logout-btn:hover {
+  background-color: #fef2f2 !important;
+  color: #dc2626 !important;
 }

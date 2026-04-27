@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
-import { MapPin, Phone, Mail, Building, Archive, ShoppingBag, DollarSign, Calendar } from 'lucide-react';
+import { MapPin, Phone, Mail, Building, Archive, ShoppingBag, DollarSign, Calendar, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import Navbar from '../components/Navbar';
 import './Vendors.css';
@@ -32,6 +32,23 @@ const Vendors = () => {
       console.error('Error fetching vendor data:', err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleVendorDelete = async (id, name) => {
+    if (!window.confirm(`Are you sure you want to delete "${name}"? This will also delete all purchase history for this vendor.`)) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase.from('vendors').delete().eq('id', id);
+      if (error) throw error;
+      
+      // Refresh data
+      setSelectedVendorId(null);
+      fetchData();
+    } catch (err) {
+      alert('Error deleting vendor: ' + err.message);
     }
   };
 
@@ -96,6 +113,13 @@ const Vendors = () => {
                       <h2 className="profile-name">{selectedVendor.name}</h2>
                       <p className="profile-id text-light">ID: {selectedVendor.id}</p>
                     </div>
+                    <button 
+                      className="delete-vendor-btn" 
+                      onClick={() => handleVendorDelete(selectedVendor.id, selectedVendor.name)}
+                      title="Delete Vendor"
+                    >
+                      <Trash2 size={18} />
+                    </button>
                   </div>
                   
                   <div className="profile-stats-grid">

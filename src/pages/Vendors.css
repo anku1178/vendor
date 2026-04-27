@@ -151,6 +151,32 @@
   font-size: 0.85rem;
 }
 
+.delete-vendor-btn {
+  margin-left: auto;
+  background: #fee2e2;
+  color: #ef4444;
+  border: 1px solid #fecaca;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.delete-vendor-btn:hover {
+  background: #ef4444;
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2);
+}
+
+.delete-vendor-btn:active {
+  transform: scale(0.95);
+}
+
 .profile-stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
